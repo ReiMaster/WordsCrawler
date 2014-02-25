@@ -13,6 +13,8 @@ import urllib2
 import re
 import types
 from bs4 import BeautifulSoup
+import xml.etree.cElementTree as ET
+
 
 class crawler_wikipedia:
 
@@ -31,6 +33,22 @@ class crawler_wikipedia:
     # the name of error pageids list file
     ErrorListFileName = r'wiki_error.txt'
 
+	#------------------------------------------------------------
+    # function:  get_content_helper(self,apistr)
+    # description: deduce the page type by content string
+    #
+    # parameter:
+    # self:
+    # apistr: string.
+    #
+    # return:
+    # string
+    #------------------------------------------------------------
+    def get_content_helper(self,apistr):
+		return u'tset the function.'
+
+
+
     #------------------------------------------------------------
     # function:  get_content_by_api(self,apistr)
     # description: get content by wikipedia api
@@ -43,33 +61,26 @@ class crawler_wikipedia:
     # string
     #------------------------------------------------------------
     def get_content_by_api(self,apistr):
-		pagecontent = urllib2.urlopen(apistr)#.read()
-        
-		bs = BeautifulSoup(str(pagecontent))
-		content = bs.p.text
-		return content		
+        pagecontent = urllib2.urlopen(apistr).read()
+        bs = BeautifulSoup(str(pagecontent))
 		
-		#return str(pagecontent)	
-
-
-
-    #------------------------------------------------------------
-    # function:  test_page_type(self,contentStr)
-    # description: deduce the page type by content string
-    #
-    # parameter:
-    # self:
-    # contentstring: string.
-    #
-    # return:
-    # int
-    #    0 --> basic mean
-    #    1 --> polysemy list
-    #    2 --> others
-    #------------------------------------------------------------
-#    def test_page_type(self,contentStr):
-#		pass
-
+        content = bs.find('page')
+        if None == content:
+            print apistr + u'    is empty!!'
+            return None		
+        else:
+			flag_title = False
+			for attribute in content.attrs:
+				if attribute == u'title':
+					flag_title = True
+			
+			if flag_title:
+				print apistr + u'     has content!!'
+				contentStr = self.get_content_helper(apistr)
+				return contentStr
+			else:
+				return None	
+    
 	#------------------------------------------------------------
 	#
 	#------------------------------------------------------------
@@ -121,7 +132,8 @@ class crawler_wikipedia:
 
 		endStr = 'end time:\n' + time.asctime() + u'\n'
 		outputfile.write(endStr)
-
+		
+		print currentApiStr
 		print u'the main function is finished!!'
 
 		outputfile.close()
